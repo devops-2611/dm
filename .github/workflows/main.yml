@@ -1,4 +1,36 @@
-name: 1_school_desc
-on:
-  workflow_dispatch
+name: US News School Scraper
 
+on:
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 pandas openpyxl
+
+      - name: ▶️ Run scraper
+        run: |
+          python usnews_scraper.py
+
+      - name: 🗜️ Zip output
+        run: |
+          zip usnews_output.zip usnews_output.csv
+
+      - name: 📤 Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: usnews-results
+          path: usnews_output.zip
